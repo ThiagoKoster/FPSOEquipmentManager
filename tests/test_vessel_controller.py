@@ -3,7 +3,7 @@ import json
 from api.app import create_app
 
 
-class VesselTest(flask_unittest.AppTestCase):
+class TestVessel(flask_unittest.AppTestCase):
     def create_app(self):
         return create_app(':memory:')
 
