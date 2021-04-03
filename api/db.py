@@ -5,6 +5,7 @@ db = SQLAlchemy()
 
 def config_db(app, db_uri):
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + db_uri
-    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
     db.init_app(app)
     db.create_all(app=app)
+
