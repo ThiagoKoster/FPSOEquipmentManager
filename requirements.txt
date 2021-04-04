@@ -20,6 +20,7 @@ MarkupSafe==1.1.1
 marshmallow==3.11.1
 marshmallow-sqlalchemy==0.24.2
 packaging==20.9
+Paste==3.5.0
 pluggy==0.13.1
 py==1.10.0
 pyparsing==2.4.7
@@ -32,4 +33,5 @@ six==1.15.0
 SQLAlchemy==1.4.4
 SQLAlchemy-Utils==0.36.8
 toml==0.10.2
+waitress==2.0.0
 Werkzeug==1.0.1

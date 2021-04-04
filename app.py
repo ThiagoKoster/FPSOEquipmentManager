@@ -1,9 +1,16 @@
-from flask import Flask, Blueprint
+from flask import Flask, Blueprint, request
 from flask_restx import Api
 from api.ma import ma
 from api.db import db
 from api.resources.vessel import ns_vessel
 from api.resources.equipment import ns_equipment
+from paste.translogger import TransLogger
+from waitress import serve
+import logging
+
+
+logger = logging.getLogger('waitress')
+logger.setLevel(logging.INFO)
 
 
 def create_app(db_uri):
@@ -22,14 +29,16 @@ def create_app(db_uri):
 
     restx_api.add_namespace(ns_vessel)
     restx_api.add_namespace(ns_equipment)
-
+    logging.basicConfig()
     db.init_app(app)
     ma.init_app(app)
     db.create_all(app=app)
+
     return app
 
 
 if __name__ == '__main__':
     app = create_app('FPSOEquipmentManager.db')
 
-    app.run()
+    logger.info("Starting server...")
+    serve(TransLogger(app), host='localhost', port=5000)

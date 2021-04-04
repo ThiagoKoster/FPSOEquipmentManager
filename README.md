@@ -49,6 +49,9 @@ Backend to manage different equipment of an FPSO (Floating Production, Storage a
 * [SQLite](https://sqlite.org/index.html) - Data persistence and in memory database for unit tests.
 * [Github Actions](https://github.com/ThiagoKoster/FPSOEquipmentManager/actions) - Created a workflow to execute automate
   tests when a Pull Request is done
+* [Waitress](https://github.com/Pylons/waitress) - Production server
+* [Paste](https://pythonpaste.readthedocs.io/en/latest/) - Paste.Translogger to log traffic request on the console
+
 
 
 

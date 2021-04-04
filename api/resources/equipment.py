@@ -62,6 +62,7 @@ class EquipmentResource(Resource):
 
     @ns_equipment.expect([inactivate_equipment_serializer])
     @ns_equipment.response(400, 'Bad request')
+    @ns_equipment.response(404, 'Vessel not found')
     @ns_equipment.response(204, 'Equipments deactivated successfully')
     def patch(self, vessel_id):
         """Inactivate equipments of the vessel"""
