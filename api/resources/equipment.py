@@ -21,7 +21,7 @@ equipment_serializer = ns_equipment.model('Equipment', {
     'code': fields.String(required=True, description='The equipment\'s code'),
     'location': fields.String(required=True, description='The equipment\'s location'),
     'status': fields.String(readonly=True, description=' The equipment\'s status',
-                            enum=[x.value for x in Status], attribute='status.name')
+                            enum=[x.name for x in Status], attribute='status.name')
 })
 # Model required by flask_restx for expect
 inactivate_equipment_serializer = ns_equipment.model('InactivateEquipment', {
@@ -45,7 +45,7 @@ class EquipmentResource(Resource):
     @ns_equipment.response(404, 'Vessel not found')
     @ns_equipment.response(409, 'Equipment code already in use')
     def post(self, vessel_id):
-
+        """Registers new equipment for the vessel"""
         parse_result = self._validate_post_request(request.data)
         new_equipment = self.bus.add_equipment(vessel_id, parse_result)
 
@@ -55,6 +55,7 @@ class EquipmentResource(Resource):
     @ns_equipment.doc(params={'status': 'Equipment status'})
     @ns_equipment.response(404, 'Vessel not found')
     def get(self,  vessel_id):
+        """Get all equipments of the vessel, can be filtered by status."""
         status = request.args.get('status', None)
         equipments = self.bus.get_vessel_equipments(vessel_id, status)
         return equipments, HTTPStatus.OK
@@ -63,6 +64,7 @@ class EquipmentResource(Resource):
     @ns_equipment.response(400, 'Bad request')
     @ns_equipment.response(204, 'Equipments deactivated successfully')
     def patch(self, vessel_id):
+        """Inactivate equipments of the vessel"""
         request_objects = self._validate_patch_request(request.data)
         self.bus.inactivate_equipments(vessel_id, [obj['code'] for obj in request_objects])
         return '', HTTPStatus.NO_CONTENT

@@ -273,7 +273,7 @@ class TestEquipment(flask_unittest.AppTestCase):
     @staticmethod
     def _inactivate_equipments(client, vessel_id, request_body):
         response = client.patch(
-            f'/vessels/{vessel_id}/equipments',
+            f'api/v1/vessels/{vessel_id}/equipments',
             content_type='application/json',
             data=json.dumps(request_body),
             follow_redirects=True
@@ -287,7 +287,7 @@ class TestEquipment(flask_unittest.AppTestCase):
     @staticmethod
     def _get_equipments_with_status(client, vessel_id, status):
         response = client.get(
-            f'/vessels/{vessel_id}/equipments?status={status}',
+            f'api/v1/vessels/{vessel_id}/equipments?status={status}',
             content_type='application/json',
             follow_redirects=True
         )
@@ -297,7 +297,7 @@ class TestEquipment(flask_unittest.AppTestCase):
     @staticmethod
     def _get_equipments(client, vessel_id):
         response = client.get(
-            f'/vessels/{vessel_id}/equipments',
+            f'api/v1/vessels/{vessel_id}/equipments',
             content_type='application/json',
             follow_redirects=True
         )
@@ -307,7 +307,7 @@ class TestEquipment(flask_unittest.AppTestCase):
     @staticmethod
     def _post_equipment(client, vessel_id, body):
         response = client.post(
-            f'/vessels/{vessel_id}/equipments',
+            f'api/v1/vessels/{vessel_id}/equipments',
             data=body,
             content_type='application/json',
             follow_redirects=True
@@ -318,7 +318,7 @@ class TestEquipment(flask_unittest.AppTestCase):
     @staticmethod
     def _wrong_post_equipment(client):
         response = client.post(
-            f'/vessels/1/equipments',
+            f'api/v1/vessels/1/equipments',
             data=json.dumps([dict(
                 name2='GPS',
                 code3='GPS001',
