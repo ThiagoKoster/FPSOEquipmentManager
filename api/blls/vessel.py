@@ -1,8 +1,7 @@
-from api.models.vessel import Vessel
 from werkzeug.exceptions import Conflict
 from sqlalchemy.exc import IntegrityError
-
-from api.repositories.vessel_repository import VesselRepository
+from api.models.vessel import Vessel
+from api.repositories.vessel import VesselRepository
 
 
 class VesselBus(object):

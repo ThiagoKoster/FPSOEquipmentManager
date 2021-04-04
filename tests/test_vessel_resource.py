@@ -1,6 +1,6 @@
 import flask_unittest
 import json
-from api.app import create_app
+from app import create_app
 from api.models.vessel import Vessel
 from api.db import db
 
