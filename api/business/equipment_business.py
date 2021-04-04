@@ -4,49 +4,42 @@ from werkzeug.exceptions import BadRequest
 from sqlalchemy.exc import IntegrityError
 from api.models.vessel_model import Vessel
 from api.models.equipment_model import Equipment, Status
+from api.repositories.equipment_repository import EquipmentRepository
+from api.repositories.vessel_repository import VesselRepository
 
 
 class EquipmentBus(object):
-    def __init__(self, db):
-        self.db = db
+    def __init__(self, vessel_repository: VesselRepository, equipment_repository: EquipmentRepository):
+        self._vessel_repo = vessel_repository
+        self._equipment_repo = equipment_repository
 
     def add_equipment(self, vessel_id, equipment):
         self._validate_vessel_id(vessel_id)
         equipment = Equipment(equipment.name, equipment.code, equipment.location, vessel_id)
         try:
-            self.db.session.add(equipment)
-            self.db.session.commit()
-            return equipment
+            return self._equipment_repo.add(equipment)
         except IntegrityError:
             raise Conflict(f'Equipment code {equipment.code} already in use')
 
     def get_vessel_equipments(self, vessel_id, status):
         self._validate_vessel_id(vessel_id)
-        if status is None:
-            return self.dal_get_vessel_equipments(vessel_id)
         status_enum = self._validate_status(status)
-        equipments = self.dal_get_vessel_equipments_with_status(vessel_id, status_enum)
-        return equipments
+        return self._equipment_repo.get_by_vessel_and_status(vessel_id, status_enum)
 
-    def _validate_vessel_id(self, vessel_id):
-        vessel = self.get(vessel_id)
+    def inactivate_equipments(self, vessel_id, codes):
+        self._equipment_repo.update_status_by_code(vessel_id, codes, Status.INACTIVE)
+
+    def _validate_vessel_id(self, vessel_id) -> Vessel:
+        vessel = self._vessel_repo.get(vessel_id)
         if vessel is None:
             raise NotFound(f'Vessel with id {vessel_id} not found')
-
-    @staticmethod
-    def dal_get_vessel_equipments(vessel_id):
-        return Equipment.query.filter(Equipment.vessel_id == vessel_id).all()
-
-    @staticmethod
-    def dal_get_vessel_equipments_with_status(vessel_id, status):
-        return Equipment.query.filter(Equipment.vessel_id == vessel_id, Equipment.status == status).all()
-
-    @staticmethod
-    def get(vessel_id):
-        return Vessel.query.get(vessel_id)
+        return vessel
 
     @staticmethod
     def _validate_status(status):
+        if status is None:
+            return None
+
         try:
             status_enum = Status[status.upper()]
         except KeyError:

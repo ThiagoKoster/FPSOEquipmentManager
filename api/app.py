@@ -9,6 +9,7 @@ def create_app(db_uri):
     app = Flask(__name__)
     app.config['RESTX_ERROR_404_HELP'] = False
     config_db(app, db_uri)
+
     restX_api.init_app(app)
     restX_api.add_namespace(ns_vessel)
     restX_api.add_namespace(ns_equipment)
