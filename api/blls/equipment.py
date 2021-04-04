@@ -2,8 +2,8 @@ from werkzeug.exceptions import NotFound
 from werkzeug.exceptions import Conflict
 from werkzeug.exceptions import BadRequest
 from sqlalchemy.exc import IntegrityError
-from api.models.vessel_model import Vessel
-from api.models.equipment_model import Equipment, Status
+from api.models.vessel import Vessel
+from api.models.equipment import Equipment, Status
 from api.repositories.equipment_repository import EquipmentRepository
 from api.repositories.vessel_repository import VesselRepository
 
@@ -13,13 +13,13 @@ class EquipmentBus(object):
         self._vessel_repo = vessel_repository
         self._equipment_repo = equipment_repository
 
-    def add_equipment(self, vessel_id, equipment):
+    def add_equipment(self, vessel_id, equipments_dict):
         self._validate_vessel_id(vessel_id)
-        equipment = Equipment(equipment.name, equipment.code, equipment.location, vessel_id)
+        equipments = [Equipment(e['name'], e['code'], e['location'], vessel_id) for e in equipments_dict]
         try:
-            return self._equipment_repo.add(equipment)
-        except IntegrityError:
-            raise Conflict(f'Equipment code {equipment.code} already in use')
+            return self._equipment_repo.add(equipments)
+        except IntegrityError as e:
+            raise Conflict(f'Equipment code {e.params[1]} already in use')
 
     def get_vessel_equipments(self, vessel_id, status):
         self._validate_vessel_id(vessel_id)
