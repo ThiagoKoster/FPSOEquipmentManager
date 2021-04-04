@@ -59,7 +59,7 @@ class TestVessel(flask_unittest.AppTestCase):
     @staticmethod
     def post_vessel(client, code):
         response = client.post(
-            '/vessels',
+            'api/v1/vessels',
             data=json.dumps(dict(
                 code=code
             )),
@@ -72,7 +72,7 @@ class TestVessel(flask_unittest.AppTestCase):
     @staticmethod
     def _wrong_post_vessel(client):
         response = client.post(
-            '/vessels',
+            'api/v1/vessels',
             data=json.dumps(dict(
                 wrong_property='test'
             )),

@@ -21,7 +21,7 @@ equipment_serializer = ns_equipment.model('Equipment', {
     'code': fields.String(required=True, description='The equipment\'s code'),
     'location': fields.String(required=True, description='The equipment\'s location'),
     'status': fields.String(readonly=True, description=' The equipment\'s status',
-                            enum=Status._member_names_)
+                            enum=[x.name for x in Status], attribute='status.name')
 })
 # Model required by flask_restx for expect
 inactivate_equipment_serializer = ns_equipment.model('InactivateEquipment', {
