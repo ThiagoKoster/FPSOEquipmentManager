@@ -244,6 +244,19 @@ class TestEquipment(flask_unittest.AppTestCase):
             self.assertEqual(response.status_code, expected_status_code)
             self.assertEqual(data['message']['1']['wrong_prop'][0], 'Unknown field.')
 
+    def test_patch_equipment_return_notFound_when_vessel_not_in_db(self, app):
+        with app.test_client() as client:
+            # ARRANGE
+
+            expected_status_code = HTTPStatus.NOT_FOUND
+            request_body = [{'code': 'GPS1'}]
+
+            # ACT
+            response, data = self._inactivate_equipments(client, 1, request_body)
+
+            self.assertEqual(response.status_code, expected_status_code)
+            self.assertEqual(data['message'], 'Vessel with id 1 not found')
+
     def test_patch_equipment_return_noContent_when_inactivate(self, app):
         with app.test_client() as client:
             # ARRANGE

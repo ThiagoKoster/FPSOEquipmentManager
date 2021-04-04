@@ -27,6 +27,7 @@ class EquipmentBus(object):
         return self._equipment_repo.get_by_vessel_and_status(vessel_id, status_enum)
 
     def inactivate_equipments(self, vessel_id, codes):
+        self._validate_vessel_id(vessel_id)
         self._equipment_repo.update_status_by_code(vessel_id, codes, Status.INACTIVE)
 
     def _validate_vessel_id(self, vessel_id) -> Vessel:
