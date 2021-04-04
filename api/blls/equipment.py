@@ -4,8 +4,8 @@ from werkzeug.exceptions import BadRequest
 from sqlalchemy.exc import IntegrityError
 from api.models.vessel import Vessel
 from api.models.equipment import Equipment, Status
-from api.repositories.equipment_repository import EquipmentRepository
-from api.repositories.vessel_repository import VesselRepository
+from api.repositories.equipment import EquipmentRepository
+from api.repositories.vessel import VesselRepository
 
 
 class EquipmentBus(object):

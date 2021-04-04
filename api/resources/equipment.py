@@ -4,8 +4,8 @@ from marshmallow import ValidationError
 from werkzeug.exceptions import BadRequest
 from http import HTTPStatus
 from api.models.equipment import Status
-from api.repositories.equipment_repository import EquipmentRepository
-from api.repositories.vessel_repository import VesselRepository
+from api.repositories.equipment import EquipmentRepository
+from api.repositories.vessel import VesselRepository
 from api.schema.equipment import EquipmentSchema
 from api.schema.inactivate_equipments import InactivateEquipmentSchema
 from api.blls.equipment import EquipmentBus

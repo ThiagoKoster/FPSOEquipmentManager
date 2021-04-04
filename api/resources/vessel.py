@@ -2,7 +2,7 @@ from flask import request
 from flask_restx import Resource, Namespace, fields
 from marshmallow import ValidationError
 from werkzeug.exceptions import BadRequest
-from api.repositories.vessel_repository import VesselRepository
+from api.repositories.vessel import VesselRepository
 from api.resources.equipment import equipment_serializer
 from api.schema.vessel import VesselSchema
 from api.blls.vessel import VesselBus
