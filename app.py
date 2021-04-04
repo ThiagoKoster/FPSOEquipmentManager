@@ -8,7 +8,7 @@ from api.resources.equipment import ns_equipment
 
 def create_app(db_uri):
     app = Flask(__name__)
-    blueprint = Blueprint('api', __name__, url_prefix='/api')
+    blueprint = Blueprint('api', __name__, url_prefix='/api/v1')
     restx_api = Api(blueprint, version='1,0',
                     doc='/doc',
                     title='FPSO Equipment Manager',

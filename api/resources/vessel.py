@@ -31,12 +31,14 @@ class VesselResource(Resource):
     @ns_vessel.response(400, 'Bad request')
     @ns_vessel.response(409, 'Vessel Code already in use')
     def post(self):
+        """Registers a new vessel with an unique code in the database."""
         vessel_req = self._validate_post_request(request.data)
         new_vessel = self.bus.add(vessel_req['code'])
         return new_vessel, 201
 
     @ns_vessel.marshal_list_with(vessel)
     def get(self):
+        """Returns all vessels in the database."""
         return self.bus.get_vessels()
 
     def _validate_post_request(self, data):
