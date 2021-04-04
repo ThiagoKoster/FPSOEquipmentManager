@@ -1,4 +1,4 @@
-from api.models.vessel_model import Vessel
+from api.models.vessel import Vessel
 from werkzeug.exceptions import Conflict
 from sqlalchemy.exc import IntegrityError
 

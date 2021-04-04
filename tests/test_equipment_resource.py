@@ -1,8 +1,8 @@
 import flask_unittest
 import json
 from api.app import create_app
-from api.models.vessel_model import Vessel
-from api.models.equipment_model import Equipment, Status
+from api.models.vessel import Vessel
+from api.models.equipment import Equipment, Status
 from api.db import db
 from http import HTTPStatus
 
@@ -18,15 +18,21 @@ class TestEquipment(flask_unittest.AppTestCase):
         with app.test_client() as client:
             # ARRANGE
             expected_status_code = HTTPStatus.NOT_FOUND
-
+            body = json.dumps([
+                dict(
+                    name='GPS',
+                    code='GPS001',
+                    location='Brazil'
+                )
+            ])
             # ACT
-            response, data = self._post_equipment(client, vessel_id=10, code='GPS0001')
+            response, data = self._post_equipment(client, vessel_id=10, body=body)
 
             # ASSERT
             self.assertEqual(response.status_code, expected_status_code)
             self.assertTrue('Vessel with id 10 not found' in data['message'])
 
-    def test_post_equipment_return_conflict_when_code_duplicated(self, app):
+    def test_post_equipment_return_conflict_when_code_duplicated_in_db(self, app):
         with app.test_client() as client:
             # ARRANGE
             expected_status_code = HTTPStatus.CONFLICT
@@ -35,12 +41,51 @@ class TestEquipment(flask_unittest.AppTestCase):
             vessel.equipments = [Equipment(name='GPS', code='GPS0001', location='Brazil', vessel_id=0)]
             db.session.add(vessel)
             db.session.commit()
+            body = json.dumps([
+                dict(
+                    name='GPS',
+                    code='GPS0001',
+                    location='Brazil'
+                )
+            ])
             # ACT
-            response, data = self._post_equipment(client, vessel_id=1, code='GPS0001')
+            response, data = self._post_equipment(client, vessel_id=1, body=body)
 
             # ASSERT
             self.assertEqual(response.status_code, expected_status_code)
-            self.assertTrue('Equipment code GPS0001 already in use' in data['message'])
+            self.assertEqual('Equipment code GPS0001 already in use', data['message'])
+
+    def test_post_equipment_return_conflict_when_code_duplicated_in_request(self, app):
+        with app.test_client() as client:
+            # ARRANGE
+            expected_status_code = HTTPStatus.CONFLICT
+            vessel = Vessel(code='MV102')
+            db.session.add(vessel)
+            db.session.commit()
+
+            body = json.dumps([
+                dict(
+                    name='GPS',
+                    code='GPS0001',
+                    location='Brazil'
+                ),
+                dict(
+                    name='GPS',
+                    code='GPS0002',
+                    location='Brazil'
+                ),
+                dict(
+                    name='GPS',
+                    code='GPS0001',
+                    location='Brazil'
+                )
+            ])
+            # ACT
+            response, data = self._post_equipment(client, vessel_id=1, body=body)
+
+            # ASSERT
+            self.assertEqual(response.status_code, expected_status_code)
+            self.assertEqual('Equipment code GPS0001 already in use', data['message'])
 
     def test_post_equipment_return_badRequest_when_wrong_requestBody(self, app):
         with app.test_client() as client:
@@ -52,9 +97,83 @@ class TestEquipment(flask_unittest.AppTestCase):
 
             # ASSERT
             self.assertEqual(response.status_code, expected_status_code)
-            self.assertEqual(data['message'], 'Input payload validation failed')
 
-    def test_get_equipment_return_NOT_FOUND_when_vessel_not_in_db(self, app):
+            self.assertEqual(data['message']['0']['code'], ['Missing data for required field.'])
+            self.assertEqual(data['message']['0']['name'], ['Missing data for required field.'])
+            self.assertEqual(data['message']['0']['location'], ['Missing data for required field.'])
+            self.assertEqual(data['message']['0']['name2'], ['Unknown field.'])
+            self.assertEqual(data['message']['0']['code3'], ['Unknown field.'])
+            self.assertEqual(data['message']['0']['location4'], ['Unknown field.'])
+
+    def test_post_equipment_return_created_when_no_existing_equipments(self, app):
+        with app.test_client() as client:
+            # ARRANGE
+            vessel = Vessel(code='MV102')
+            db.session.add(vessel)
+            db.session.commit()
+            expected_status_code = HTTPStatus.CREATED
+            body = json.dumps([
+                dict(
+                    name='GPS',
+                    code='GPS001',
+                    location='Brazil'
+                ),
+                dict(
+                    name='Compressor',
+                    code='5310B9D7',
+                    location='Brazil'
+                )
+            ])
+            # ACT
+            response, data = self._post_equipment(client, 1, body)
+
+            # ASSERT
+            self.assertEqual(response.status_code, expected_status_code)
+            self.assertEqual(vessel.equipments[0].id, 1)
+            self.assertEqual(vessel.equipments[0].name, 'GPS')
+            self.assertEqual(vessel.equipments[0].code, 'GPS001')
+            self.assertEqual(vessel.equipments[0].location, 'Brazil')
+            self.assertEqual(vessel.equipments[0].status, Status.ACTIVE)
+            
+            self.assertEqual(vessel.equipments[-1].id, 2)
+            self.assertEqual(vessel.equipments[-1].name, 'Compressor')
+            self.assertEqual(vessel.equipments[-1].code, '5310B9D7')
+            self.assertEqual(vessel.equipments[-1].location, 'Brazil')
+            self.assertEqual(vessel.equipments[-1].status, Status.ACTIVE)
+
+    def test_post_equipment_return_created_when_no_conflict(self, app):
+        with app.test_client() as client:
+            # ARRANGE
+            vessel = Vessel(code='MV102')
+            vessel.equipments = [Equipment(name='GPS', code='GPS0001', location='Brazil', vessel_id=0)]
+            db.session.add(vessel)
+            db.session.commit()
+            expected_status_code = HTTPStatus.CREATED
+            body = json.dumps([
+                dict(
+                    name='Compressor',
+                    code='432B9D7',
+                    location='Brazil'
+                )
+            ])
+            # ACT
+            response, data = self._post_equipment(client, 1, body)
+
+            # ASSERT
+            self.assertEqual(response.status_code, expected_status_code)
+            self.assertEqual(vessel.equipments[0].id, 1)
+            self.assertEqual(vessel.equipments[0].name, 'GPS')
+            self.assertEqual(vessel.equipments[0].code, 'GPS0001')
+            self.assertEqual(vessel.equipments[0].location, 'Brazil')
+            self.assertEqual(vessel.equipments[0].status, Status.ACTIVE)
+
+            self.assertEqual(vessel.equipments[-1].id, 2)
+            self.assertEqual(vessel.equipments[-1].name, 'Compressor')
+            self.assertEqual(vessel.equipments[-1].code, '432B9D7')
+            self.assertEqual(vessel.equipments[-1].location, 'Brazil')
+            self.assertEqual(vessel.equipments[-1].status, Status.ACTIVE)
+
+    def test_get_equipment_return_notFound_when_vessel_not_in_db(self, app):
         with app.test_client() as client:
             # ARRANGE
             expected_status_code = HTTPStatus.NOT_FOUND
@@ -186,14 +305,10 @@ class TestEquipment(flask_unittest.AppTestCase):
         return response, data
 
     @staticmethod
-    def _post_equipment(client, vessel_id, code):
+    def _post_equipment(client, vessel_id, body):
         response = client.post(
             f'/vessels/{vessel_id}/equipments',
-            data=json.dumps(dict(
-                name='GPS',
-                code=code,
-                location='Brazil'
-            )),
+            data=body,
             content_type='application/json',
             follow_redirects=True
         )
@@ -204,11 +319,11 @@ class TestEquipment(flask_unittest.AppTestCase):
     def _wrong_post_equipment(client):
         response = client.post(
             f'/vessels/1/equipments',
-            data=json.dumps(dict(
+            data=json.dumps([dict(
                 name2='GPS',
                 code3='GPS001',
                 location4='Brazil'
-            )),
+            )]),
             content_type='application/json',
             follow_redirects=True
         )

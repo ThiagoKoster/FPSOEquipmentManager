@@ -1,25 +1,34 @@
-from flask import Flask
-from api.restx import restX_api
-from api.db import config_db
-from api.endpoints.vessel_controller import ns_vessel
-from api.endpoints.equipment_controller import ns_equipment
+from flask import Flask, Blueprint
+from flask_restx import Api
+from api.ma import ma
+from api.db import db
+from api.resources.vessel import ns_vessel
+from api.resources.equipment import ns_equipment
 
 
 def create_app(db_uri):
     app = Flask(__name__)
-    app.config['RESTX_ERROR_404_HELP'] = False
-    config_db(app, db_uri)
+    blueprint = Blueprint('api', __name__)
+    restx_api = Api(blueprint, version='1,0',
+                    title='FPSO Equipment Manager',
+                    description='Backend to manage different equipment of an FPSO '
+                                '(Floating Production, Storage and Offloading)')
+    app.register_blueprint(blueprint)
 
-    restX_api.init_app(app)
-    restX_api.add_namespace(ns_vessel)
-    restX_api.add_namespace(ns_equipment)
+    app.config['RESTX_ERROR_404_HELP'] = False
+    app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_uri}'
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
+
+    restx_api.add_namespace(ns_vessel)
+    restx_api.add_namespace(ns_equipment)
+
+    db.init_app(app)
+    ma.init_app(app)
+    db.create_all(app=app)
     return app
 
 
-def main():
-    app = create_app('test.db')
-    app.run()
-
-
 if __name__ == '__main__':
-    main()
+    app = create_app('FPSOEquipmentManager.db')
+
+    app.run()

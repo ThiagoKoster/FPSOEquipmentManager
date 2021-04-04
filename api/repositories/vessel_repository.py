@@ -1,5 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
-from api.models.vessel_model import Vessel
+from api.models.vessel import Vessel
 
 
 class VesselRepository:

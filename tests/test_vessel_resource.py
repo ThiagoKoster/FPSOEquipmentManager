@@ -1,19 +1,23 @@
 import flask_unittest
 import json
 from api.app import create_app
-from api.models.vessel_model import Vessel
+from api.models.vessel import Vessel
+from api.db import db
 
 
 class TestVessel(flask_unittest.AppTestCase):
     def create_app(self):
         return create_app(':memory:')
 
+    def setUp(self, app):
+        db.app = app
+
     def test_post_return_created_vessel_when_no_problems(self, app):
         with app.test_client() as client:
             # ARRANGE
-
             expected_response = {'id': 1, 'code': 'MV012', 'equipments': []}
             expected_status_code = 201
+
             # ACT
             response, data = self.post_vessel(client, expected_response['code'])
             vessel = Vessel.query.get(1)
@@ -49,7 +53,8 @@ class TestVessel(flask_unittest.AppTestCase):
 
             # ASSERT
             self.assertEqual(response.status_code, expected_status_code)
-            self.assertEqual(data['message'], 'Input payload validation failed')
+            self.assertEqual(data['message']['code'], ['Missing data for required field.'])
+            self.assertEqual(data['message']['wrong_property'], ['Unknown field.'])
 
     @staticmethod
     def post_vessel(client, code):
