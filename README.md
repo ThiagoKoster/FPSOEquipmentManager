@@ -22,9 +22,16 @@ Backend to manage different equipment of an FPSO (Floating Production, Storage a
     </li>
     <li><a href="#usage">Usage</a></li>
       <ul>
-        <li><a href="#runtheapplication">Run the application</a></li>
-        <li><a href="#testtheapplication">Test the application</a></li>
-        <li><a href="#apiresources">API Resources</a></li>
+        <li><a href="#run-the-application">Run the application</a></li>
+        <li><a href="#test-the-application">Test the application</a></li>
+        <li><a href="#api-resources">API Resources</a></li>
+          <ul>
+            <li><a href="#post-vessels">Create a vessel</a></li>
+            <li><a href="#get-vessels">Get vessels</a></li>
+            <li><a href="#post-vesselsidequipments">Create equipments</a></li>
+            <li><a href="#patch-vesselsidequipments">Inactivate equipments</a></li>
+            <li><a href="#get-vesselsidequipments">Get equipments</a></li>
+          </ul>
       </ul>
     <li><a href="#contact">Contact</a></li>
   </ol>
@@ -82,11 +89,11 @@ It's possible to do all requests with swagger!
    
 
 ### API Resources
-* [POST /vessels](#post-vessel) 
+* [POST /vessels](#post-vessels) 
 * [GET /vessels](#get-vessels)
-* [POST /vessels/[id]/equipments](#post-vesselequipment)
-* [PATCH /vessels/[id]/equipments](#inactivate-vesselequipment)
-* [GET /vessels/[id]/equipments](#get-vesselequipment)
+* [POST /vessels/[id]/equipments](#post-vesselsidequipments)
+* [PATCH /vessels/[id]/equipments](#patch-vesselsidequipments)
+* [GET /vessels/[id]/equipments](#get-vesselsidequipments)
 
 #### POST /vessels
 Registers a new vessel with an unique code in the database
