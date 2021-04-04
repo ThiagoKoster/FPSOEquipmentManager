@@ -82,8 +82,7 @@ This will start the application at <http://localhost:5000/api/v1>
 It's possible to do all requests with swagger!
 
 - The swagger doc can be accessed at <http://localhost:5000/api/v1/doc> when the application is running.
-![alt text](docs/resources/swagger-usage.gif)
-
+![alt text](docs/resources/swagger-usage-2.gif)
 - All models can be seen at the "Models" section.
 ![alt text](docs/resources/models-swagger.png)
    
