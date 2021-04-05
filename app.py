@@ -1,4 +1,4 @@
-from flask import Flask, Blueprint, request
+from flask import Flask, Blueprint, jsonify
 from flask_restx import Api
 from api.ma import ma
 from api.db import db
@@ -6,6 +6,7 @@ from api.resources.vessel import ns_vessel
 from api.resources.equipment import ns_equipment
 from paste.translogger import TransLogger
 from waitress import serve
+from http import HTTPStatus
 import logging
 
 
@@ -39,6 +40,11 @@ def create_app(db_uri):
 
 if __name__ == '__main__':
     app = create_app('FPSOEquipmentManager.db')
+
+
+    @app.errorhandler(HTTPStatus.NOT_FOUND)
+    def resource_not_found(e):
+        return jsonify(error=str(e)), HTTPStatus.NOT_FOUND
 
     logger.info("Starting server...")
     serve(TransLogger(app), host='localhost', port=5000)
